@@ -195,3 +195,18 @@ _publications: github.com/trailofbits/publications_
     - these techniques aren't only useful to NASA & car manufacturers
 1. Even semi-formal methods (like DbC + invariants + fuzzing) can get huge wins
 1. a willingness to throw out the bad
+
+---
+
+# the good: formal methods
+
+---
+
+# the good: semi-formal methods
+
+---
+
+# the good: throw out the bad
+
+---
+
