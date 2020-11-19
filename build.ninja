@@ -1,0 +1,5 @@
+rule press
+    command = cat $in > $out
+    description = simply concatenate the various files into the presentation
+
+build presentation.html: press header.html presentation.md footer.html

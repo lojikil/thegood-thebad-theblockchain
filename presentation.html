@@ -1,0 +1,258 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>The Good, The Bad, The Blockchain</title>
+    <script src="https://gnab.github.io/remark/downloads/remark-0.5.9.min.js" type="text/javascript"> </script>
+    <style type="text/css" media="screen">
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif);
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: 400;
+        margin-bottom: 0;
+        margin-top: 10px;
+      }
+      h1 { font-size: 3.5em; }
+      h2 { font-size: 3em; }
+      h3 { font-size: 1.6em; }
+      .inverse {
+        background: #272822;
+        color: #777872;
+        text-shadow: 0 0 20px #333;
+      }
+      .inverse h1, .inverse h2 {
+        color: #f3f3f3;
+        line-height: 0.8em;
+      }
+
+      pre {
+        border-left: 0.4em solid #d7d7d7;
+        padding: 1em !important;
+      }
+      code {
+        background: transparent !important;
+      }
+      a {
+        color: #F92672;
+        text-decoration: none;
+      }
+      .task {
+        float: right;
+        font-size: 0.9em;
+        padding-top: 0.6em;
+      }
+      .task a {
+        color: #080;
+        text-decoration: none;
+      }
+      .right {
+        float: right;
+        margin-left: 1em;
+      }
+      .pushdown {
+        margin-top: 12em;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+# The Good, The Bad, The Blockchain
+## a love story
+
+---
+
+# outline
+
+1. intro
+1. take aways
+1. definitions
+1. the good
+    1. formal modeling
+    1. testing
+    1. specification
+1. the bad
+    1. the money
+    1. the price
+    1. the tools
+1. the ugly
+    1. reentracy, a ballad of TOCTOU
+    1. precision, numerics, and you
+    1. infosec still counts
+
+---
+
+# take aways
+
+.right[![NIST IR 8202 flowchart](images/do-you-need-a-blockchain.png)]
+
+if you take anything away from this talk:
+
+1. [NIST IR 8202](https://nvlpubs.nist.gov/nistpubs/ir/2018/NIST.IR.8202.pdf) is correct, you probably don't need blockchain
+1. blockchain gets many things correct, some even better than traditional infosec
+1. there are no golden roads to security, Consistency/Availability/Partition Tolerance (CAP), or correctness
+
+---
+
+# `$ finger lojikil`
+
+```
+[lojikil.com]
+Stefan Edwards (lojikil) is not presently logged in.
+
+- Practice Lead at Trail of Bits
+- Twitter/Github/Lobste.rs: lojikil
+- Works in: Defense, FinTech, Blockchain, IoT, compilers,
+vCISO services, threat modeling
+- Previous: net, web, adversary sim, &c. 
+- Infosec philosopher, programming 
+language theorist, everyday agronomer, father.
+- As heard on Absolute AppSec (multiple) and Risky
+Business (No. 559).
+
+WARNING: DEAF
+WARNING: Noo Yawk
+```
+
+---
+
+# Trail of Bits
+
+- large number of smart contract assessments (5-10 *per month*)
+- large number of bespoke blockchain assessments (~ 5 *per year*)
+- work on tools like Manticore (symbex), Echidna (property testing), Slither (static analysis & absint)
+- surrounding areas: cryptography, infra, &c
+
+_publications: github.com/trailofbits/publications_
+
+---
+
+# what do I mean by "blockchains"
+
+- most folks: money, maybe distributed state
+- me: consensus algorithms, VMs, smart contracts, storage, money, governance, ...
+- read: this is complex
+
+---
+
+# definitions
+
+## for this talk, there are two major concepts we need to understand
+
+- blockchains, and some terms around them
+- formal methods
+
+---
+
+# blockchains
+
+- basically:
+  - some consensus algorthim *PLUS*
+  - some storage system *PLUS*
+  - some validation system *AND OFTEN PLUS*
+  - some virtual machine, wire protocol, &c.
+
+---
+
+# definitions
+
+- at their core, blockchains are state machines
+- consensus: a mechanism for replicating states
+- many different types:
+  - Byzantine Fault Tolerance
+  - Proof of Work (`I calculated this big number to show I am correct`)
+  - Proof of Stake (`I have this much money to show I am correct`)
+  - Proof of Authority (`Dude, you know me, I'm good for it...`)
+    - often combined with another algorithm, for actual consensus
+- basically: we need to take state of current world, and derive new world from it, with minimal trust
+
+---
+
+# definitions: let's build a simple blockchain
+
+## all we need is:
+
+- Some function `H`
+- Some key `K`
+- a calculated result: `H(K, data) == some unique value`
+- Blockchains: repeated applications of `H` over new data
+- including previous data
+
+---
+
+![a simple blockchain](images/blockchain0.png)
+
+---
+
+# defintions: let's build a simple blockchain
+
+## lojichain satisfies the above:
+
+- consensus algorithm: proof of authority + sole source
+- storage system: simple linked list of nodes
+- validation system: easily check that items were signed/HMAC'd with my key
+
+---
+
+![an attacker attempting to add data cannot without access to the key](images/blockchain1.png)
+
+---
+
+# definitions: quite old concepts
+
+- Merkle Trees (1979)
+    - most blockchains use some form of Hash Tree like Merkle
+    - some use AVL trees that have been Merkle-ized
+- Linked-Time Stamps (1992)
+- Direct Acyclical Graphs (< 1960's)
+- basically: we hash some stuff and socialize it
+
+---
+
+# definitions: consensus
+
+![basically, we do all this and end up with three values...](images/consensus0.png)
+
+---
+
+# definitions: consensus
+
+![... which allows us to determine the state of the world thereafter](images/consensus1.png)
+
+---
+
+# definitions: formal methods
+
+## the other new concept is...
+
+- blockchain makes use of formal and semi-formal methods
+- symbolic execution: a group of techniques for exploring the state space of a program
+- abstract interpretation: explores the abstract domain of program values
+- program analysis: understanding the constraints under which a program executes
+- bounded modeling: checking if the state flow of a program matches the specification
+- specification: a mathematical description of the program flow
+- property testing: random testing (ala fuzzing) of program invariants
+- invariants: conditions that must be satisfied regardless of current program state
+- others: design by contract
+
+---
+
+# whoa, wtaf
+
+- it sounds harder than it is
+- basically, a group of techniques to say "we can check what our programs are doing"
+- old techniques, that blockchain is uniquely suited to
+    1. we know when things terminate
+    1. we can analyze things under fixed conditions
+    1. better for analysis than simple unit testing
+
+---
+    </textarea>
+    <script>
+      var slideshow = remark.create({ highlightLanguage: 'javascript'});
+    </script>
+  </body>
+</html>
