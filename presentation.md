@@ -9,17 +9,18 @@
 1. take aways
 1. definitions
 1. the good
-    1. formal modeling
-    1. testing
-    1. specification
+  1. formal methods
+  1. semi-formal methods
+  1. throw out the bad (Solidity => Vyper)
+  1. community
 1. the bad
-    1. the money
-    1. the price
-    1. the tools
+  1. Solidity & YUL
+  1. test environments
+  1. costs (gas, &c)
 1. the ugly
-    1. reentracy, a ballad of TOCTOU
-    1. precision, numerics, and you
-    1. infosec still counts
+  1. TOCTOU
+  1. off chain
+  1. everything I don't like is traditional infosec
 
 ---
 
@@ -73,6 +74,16 @@ _publications: github.com/trailofbits/publications_
 - most folks: money, maybe distributed state
 - me: consensus algorithms, VMs, smart contracts, storage, money, governance, ...
 - read: this is complex
+
+---
+
+# attacks occur at all levels
+
+- [Geth recently had a VM bug that caused a partial chain split](https://gist.github.com/karalabe/e1891c8a99fdc16c4e60d9713c35401f)
+- [Various network-level attacks against Pantheon](https://github.com/trailofbits/publications/blob/master/reviews/pantheon.pdf)
+- [Yam Finance missed a divison operation and lost $500m](https://cointelegraph.com/news/how-one-line-of-code-destroyed-yam-defi)
+   - `totalSupply = initSupply.mul(yamsScalingFactor)`
+   - they forgot to add `.div(BASE)`
 
 ---
 
@@ -206,7 +217,34 @@ _publications: github.com/trailofbits/publications_
 
 ---
 
-# the good: throw out the bad
+# the good: throw out the bad (Solidity => Vyper)
 
 ---
 
+# the good: community
+
+---
+
+# the bad: Solidity & YUL
+
+---
+
+# the bad: test environments
+
+---
+
+# the bad: costs (gas, &c)
+
+---
+
+# the ugly: TOCTOU
+
+---
+
+# the ugly: off chain
+
+<!-- JS components & integers, floats to Solidity floats, NTP at block level -->
+
+---
+
+# the ugly: everything I don't like is traditional infosec
